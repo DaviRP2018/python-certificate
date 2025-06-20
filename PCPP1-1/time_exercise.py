@@ -1,7 +1,10 @@
+from multiprocessing.managers import Value
+
+
 class TimeManager:
     def __init__(self, hours, minutes, seconds):
         if any([hours < 0, minutes < 0, seconds < 0]):
-            raise ValueError("Time cannot be negative")
+            raise ValueError("Time cannot be negative.")
         self.hours = hours
         self.minutes = minutes
         self.seconds = seconds
@@ -17,7 +20,14 @@ class TimeManager:
 
     def _calculate_time(self, other, operator):
         self_total_seconds = self._get_total_seconds(self.hours, self.minutes, self.seconds)
-        other_total_seconds = self._get_total_seconds(other.hours, other.minutes, other.seconds)
+
+        if isinstance(other, TimeManager):
+            other_total_seconds = self._get_total_seconds(other.hours, other.minutes, other.seconds)
+        elif isinstance(other, int):
+            other_total_seconds = other
+        else:
+            raise ValueError("Unsupported operation.")
+
         total_seconds = getattr(self_total_seconds, operator)(other_total_seconds)
 
         if total_seconds < 0:
@@ -61,14 +71,18 @@ class TimeManager:
 
 
 time1 = TimeManager(20, 0, 738)
-print(time1)
+print("time1:", time1)
 
 time2 = TimeManager(5, 33, 20)
-print(time2)
+print("time2:", time2)
 
-print(time1 + time2)
-print(time1 - time2)
-print(time2 - time1)
+print("time1 + time2:", time1 + time2)
+print("time1 - time2:", time1 - time2)
+print("time2 - time1:", time2 - time1)
 
-time3 = TimeManager(-5, 33, 20)
-print(time3)
+# time3 = TimeManager(-5, 33, 20)
+# print(time3)
+
+print("time1 - 10:", time1 - 10)
+print("time1 - 300:", time1 - 300)
+# print("time1 - 300:", time1 - 300.0)
